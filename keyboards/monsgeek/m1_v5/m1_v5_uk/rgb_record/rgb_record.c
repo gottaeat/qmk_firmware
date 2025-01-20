@@ -251,18 +251,6 @@ uint8_t find_index(void) {
     return 0;
 }
 
-void record_rgbmatrix_increase(uint8_t *last_mode) {
-    uint8_t index;
-
-    index = find_index();
-    if (rgbrec_info.state != RGBREC_STATE_ON) {
-        index = (index + 1) % (sizeof(rgbmatrix_buff) / sizeof(rgbmatrix_buff[0]));
-    }
-    *last_mode = rgbmatrix_buff[index];
-    rgb_matrix_mode(rgbmatrix_buff[index]);
-    record_color_hsv(false);
-}
-
 uint8_t record_color_read_data(void) {
     uint8_t hs_mode    = find_index();
     const uint8_t *ptr = (const uint8_t *)(((uint32_t)CONFINFO_EECONFIG_ADDR + 4) + hs_mode);
@@ -273,6 +261,20 @@ uint8_t record_color_read_data(void) {
     } else {
         return hs_c;
     }
+}
+
+void record_rgbmatrix_increase(uint8_t *last_mode) {
+    uint8_t index;
+
+    index = find_index();
+    if (rgbrec_info.state != RGBREC_STATE_ON) {
+        index = (index + 1) % (sizeof(rgbmatrix_buff) / sizeof(rgbmatrix_buff[0]));
+    }
+    *last_mode = rgbmatrix_buff[index];
+    rgb_matrix_mode(rgbmatrix_buff[index]);
+    //record_color_hsv(false);
+    uint8_t rgb_hsv_index =  record_color_read_data();
+    rgb_matrix_sethsv(rgb_hsvs[rgb_hsv_index][0], rgb_hsvs[rgb_hsv_index][1], rgb_matrix_get_val());
 }
 
 uint8_t record_color_hsv(bool status) {
