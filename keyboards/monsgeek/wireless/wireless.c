@@ -143,7 +143,8 @@ void wireless_send_nkro(report_nkro_t *report) {
     }
 #endif
 
-    wireless_driver.send_keyboard(&temp_report_keyboard);
+    while(smsg_is_busy()) wireless_task();
+    host_keyboard_send(&temp_report_keyboard);
     md_send_nkro(wls_report_nkro);
 }
 
