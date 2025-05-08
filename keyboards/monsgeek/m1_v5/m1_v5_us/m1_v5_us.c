@@ -219,9 +219,9 @@ void wireless_post_task(void) {
         wireless_devs_change(!confinfo.devs, confinfo.devs, false);
         post_init_timer = 0x00;
     }
-#    if defined(HS_BT_DEF_PIN) && defined(HS_2G4_DEF_PIN)
+
     hs_mode_scan(false, confinfo.devs, confinfo.last_btdevs);
-#    endif
+
 }
 
 uint32_t wls_process_long_press(uint32_t trigger_time, void *cb_arg) {
