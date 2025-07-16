@@ -283,10 +283,10 @@ uint8_t record_color_hsv(bool status) {
 
     for (uint8_t i = 0; i < (sizeof(sixth_gear_buff) / sizeof(sixth_gear_buff[0])); i++) {
         if (rgb_matrix_get_mode() == sixth_gear_buff[i]) {
-            temp = RGB_HSV_MAX - 1;
+            temp = RGB_HSV_MAX - 2;
             break;
         } else if (i == (sizeof(sixth_gear_buff) / sizeof(sixth_gear_buff[0]) - 1)) {
-            temp = RGB_HSV_MAX;
+            temp = RGB_HSV_MAX - 1;
         }
     }
 
@@ -294,12 +294,12 @@ uint8_t record_color_hsv(bool status) {
         if (rgb_hsv_index != temp)
             rgb_hsv_index = (rgb_hsv_index + 1);
         else
-            rgb_hsv_index = 0xFF;
+            return 0xFF;
     } else {
         if (rgb_hsv_index)
             rgb_hsv_index = (rgb_hsv_index - 1);
         else
-            rgb_hsv_index = 0xFF;
+            return 0xFF;
     }
 
     rgb_matrix_sethsv(rgb_hsvs[rgb_hsv_index][0], rgb_hsvs[rgb_hsv_index][1], rgb_matrix_get_val());

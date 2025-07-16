@@ -567,8 +567,9 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
                 if ((index != 0xFF)) {
                     rgb_blink_dir();
                 }
-                return false;
+                
             }
+            return false;
         } break;
         case RGB_SAD: {
             if (record->event.pressed) {
@@ -577,8 +578,9 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
                 if (index != 0xFF) {
                     rgb_blink_dir();
                 }
-                return false;
+               
             }
+            return false;
         } break;
         case TO(_BL): {
             if (record->event.pressed) {
@@ -886,7 +888,6 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
 void housekeeping_task_user(void) { // loop
     uint8_t hs_now_mode;
     static uint32_t hs_current_time;
-    static bool val_value = false;
 
     charging_state = readPin(HS_BAT_CABLE_PIN);
 
@@ -909,17 +910,9 @@ void housekeeping_task_user(void) { // loop
 
     if (charging_state) {
         writePin(HS_LED_BOOSTING_PIN, 0);
-        if (!val_value) {
-            rgb_matrix_sethsv_noeeprom(start_hsv.h, start_hsv.s, 150);
-        }
-        val_value = true;
 
     } else {
         writePin(HS_LED_BOOSTING_PIN, 1);
-        if (val_value) {
-            rgb_matrix_sethsv(start_hsv.h, start_hsv.s, start_hsv.v);
-        }
-        val_value = false;
     }
 
     if (timer_elapsed32(hs_ct_time) > 3000 && hs_ct_time) {

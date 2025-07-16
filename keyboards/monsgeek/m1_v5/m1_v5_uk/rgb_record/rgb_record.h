@@ -50,7 +50,7 @@
 #define HS_YELLOW       0x2BFF
 
 #define LASET_MOD_NO    0xFF
-#define RGB_HSV_MAX     7
+#define RGB_HSV_MAX     5
 #define ________        HS_BLACK
 
 #ifndef RGB_RECORD_HS_LISTS
