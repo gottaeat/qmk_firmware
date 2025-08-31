@@ -14,9 +14,9 @@
 #define HS_RGB_INDICATOR_COUNT              99
 #define HS_RGB_BAT_COUNT                    1
 
-#define MD_BT1_NAME                         "M1 V5"
-#define MD_BT2_NAME                         "M1 V5"
-#define MD_BT3_NAME                         "M1 V5"
+#define MD_BT1_NAME                         "M1 V5 BT1"
+#define MD_BT2_NAME                         "M1 V5 BT2"
+#define MD_BT3_NAME                         "M1 V5 BT3"
 #define MD_DONGLE_PRODUCT                   "M1 V5"
 
 /* Device Connection RGB Indicator Light Index And Color */
