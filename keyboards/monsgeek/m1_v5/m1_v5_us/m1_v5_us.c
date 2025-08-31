@@ -38,8 +38,6 @@ typedef struct {
 enum layers {
     _BL = 0,
     _FL,
-    _MBL,
-    _MFL,
     _FBL,
 };
 
@@ -52,12 +50,8 @@ void rgb_matrix_hs_indicator(void);
 void rgb_matrix_hs_indicator_set(uint8_t index, RGB rgb, uint32_t interval, uint8_t times);
 void rgb_matrix_hs_set_remain_time(uint8_t index, uint8_t remain_time);
 
-#define keymap_is_mac_system() ((get_highest_layer(default_layer_state) == _MBL) || (get_highest_layer(default_layer_state) == _MFL))
-#define keymap_is_base_layer() ((get_highest_layer(default_layer_state) == _BL) || (get_highest_layer(default_layer_state) == _FL))
-
 uint32_t post_init_timer     = 0x00;
 bool inqbat_flag             = false;
-bool mac_status              = false;
 bool charging_state          = false;
 bool bat_full_flag           = false;
 bool enable_bat_indicators   = true;
@@ -355,16 +349,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
     switch (keycode) {
         case MO(_FL):
-        case MO(_MFL): {
-            if (!record->event.pressed && rgbrec_is_started()) {
-                if (no_record_fg == true) {
-                    no_record_fg = false;
-                    rgbrec_register_record(keycode, record);
-                }
-                no_record_fg = true;
-            }
-            break;
-        }
         case RP_END:
         case RP_P0:
         case RP_P1:
@@ -382,7 +366,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         } break;
     }
 
-    if (rgbrec_is_started() && (!(keycode == RP_P0 || keycode == RP_P1 || keycode == RP_P2 || keycode == RP_END || keycode == RGB_MOD || keycode == MO(_FL) || keycode == MO(_MFL)))) {
+    if (rgbrec_is_started() && (!(keycode == RP_P0 || keycode == RP_P1 || keycode == RP_P2 || keycode == RP_END || keycode == RGB_MOD || keycode == MO(_FL)))) {
 
         return false;
     }
@@ -567,7 +551,7 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
                 if ((index != 0xFF)) {
                     rgb_blink_dir();
                 }
-                
+
             }
             return false;
         } break;
@@ -578,32 +562,8 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
                 if (index != 0xFF) {
                     rgb_blink_dir();
                 }
-               
-            }
-            return false;
-        } break;
-        case TO(_BL): {
-            if (record->event.pressed) {
-                rgb_matrix_hs_set_remain_time(HS_RGB_BLINK_INDEX_MAC, 0);
-                rgb_matrix_hs_indicator_set(HS_RGB_BLINK_INDEX_WIN, (RGB){RGB_WHITE}, 250, 3);
-                if (keymap_is_mac_system()) {
-                    set_single_persistent_default_layer(_BL);
-                    layer_move(0);
-                }
-            }
 
-            return false;
-        } break;
-        case TO(_MBL): {
-            if (record->event.pressed) {
-                rgb_matrix_hs_set_remain_time(HS_RGB_BLINK_INDEX_WIN, 0);
-                rgb_matrix_hs_indicator_set(HS_RGB_BLINK_INDEX_MAC, (RGB){RGB_WHITE}, 250, 3);
-                if (!keymap_is_mac_system()) {
-                    set_single_persistent_default_layer(_MBL);
-                    layer_move(0);
-                }
             }
-
             return false;
         } break;
         case RP_P0: {
@@ -691,32 +651,6 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
             }
 
             return false;
-        } break;
-        case KC_LCMD: {
-            if (keymap_is_mac_system()) {
-                if (keymap_config.no_gui && !rgbrec_is_started()) {
-                    if (record->event.pressed) {
-                        register_code16(KC_LCMD);
-                    } else {
-                        unregister_code16(KC_LCMD);
-                    }
-                }
-            }
-
-            return true;
-        } break;
-        case KC_RCMD: {
-            if (keymap_is_mac_system()) {
-                if (keymap_config.no_gui && !rgbrec_is_started()) {
-                    if (record->event.pressed) {
-                        register_code16(KC_RCMD);
-                    } else {
-                        unregister_code16(KC_RCMD);
-                    }
-                }
-            }
-
-            return true;
         } break;
         case HS_BATQ: {
             extern bool rk_bat_req_flag;
@@ -921,18 +855,6 @@ void housekeeping_task_user(void) { // loop
         rgb_matrix_hs_indicator_set(0xFF, (RGB){rgb_test_open.r, rgb_test_open.g, rgb_test_open.b}, 250, 1);
         eeconfig_confinfo_update(confinfo.raw);
         hs_ct_time = 0;
-    }
-
-    if ((readPin(SYSTEM_WIN_PIN) != 0) && (readPin(SYSTEM_MAC_PIN) == 0)) { // mac system
-        if (!keymap_is_mac_system()) {
-            set_single_persistent_default_layer(_MBL);
-            layer_move(0);
-        }
-    } else { // win system
-        if (keymap_is_mac_system()) {
-            set_single_persistent_default_layer(_BL);
-            layer_move(0);
-        }
     }
 }
 
@@ -1247,9 +1169,6 @@ bool rgb_matrix_indicators_advanced_kb(uint8_t led_min, uint8_t led_max) {
     if (host_keyboard_led_state().caps_lock)
         rgb_matrix_set_color(HS_RGB_INDEX_CAPS, 0x20, 0x20, 0x20);
 
-    if (!keymap_is_mac_system() && keymap_config.no_gui)
-        rgb_matrix_set_color(HS_RGB_INDEX_WIN_LOCK, 0x20, 0x20, 0x20);
-
 #ifdef RGBLIGHT_ENABLE
     if (rgb_matrix_indicators_advanced_rgblight(led_min, led_max) != true) {
 
@@ -1294,11 +1213,11 @@ void hs_reset_settings(void) {
     rgblight_enable();
 #endif
 
-    keymap_config.raw = eeconfig_read_keymap();
+    eeconfig_read_keymap(&keymap_config);
 
 #if defined(NKRO_ENABLE) && defined(FORCE_NKRO)
     keymap_config.nkro = 0;
-    eeconfig_update_keymap(keymap_config.raw);
+    eeconfig_update_keymap(&keymap_config);
 #endif
 
     // #if defined(WIRELESS_ENABLE)
