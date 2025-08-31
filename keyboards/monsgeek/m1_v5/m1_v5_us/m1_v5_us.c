@@ -471,13 +471,6 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
                 bootloader_jump();
             }
         } break;
-
-        case BT_TEST: {
-            if (record->event.pressed) {
-                md_send_devctrl(0x62);
-            }
-            return false;
-        } break;
         case NK_TOGG: {
             if (rgbrec_is_started()) {
 
@@ -789,17 +782,6 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
             } else {
                 return true;
             }
-        } break;
-        case HS_SIRI: {
-            if (record->event.pressed) {
-                register_code(KC_LCMD);
-                register_code(KC_SPC);
-                wait_ms(20);
-            } else {
-                unregister_code(KC_SPC);
-                unregister_code(KC_LCMD);
-            }
-            return false;
         } break;
         case KC_MCTL: {
             if (record->event.pressed) {
