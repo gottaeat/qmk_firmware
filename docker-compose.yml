@@ -1,0 +1,7 @@
+---
+services:
+  qmk:
+    platform: linux/amd64
+    build:
+      context: .
+    network_mode: host
